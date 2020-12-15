@@ -24,12 +24,18 @@
     <ClInclude Include="MainWindow.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="File.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entryPoint.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
