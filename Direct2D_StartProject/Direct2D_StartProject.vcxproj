@@ -90,9 +90,19 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <AdditionalOptions>
+        <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+  <asmv3:application>
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      <dpiAware>true</dpiAware>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly> %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -142,12 +152,10 @@
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="entryPoint.h" />
     <ClInclude Include="File.h" />
-    <ClInclude Include="MainWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entryPoint.cpp" />
     <ClCompile Include="File.cpp" />
-    <ClCompile Include="MainWindow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
