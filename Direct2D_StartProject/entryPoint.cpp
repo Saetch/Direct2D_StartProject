@@ -6,6 +6,8 @@
 
 #include "BaseWindow.h"
 
+int icall = 0;
+
 template <class T> void SafeRelease(T** ppT)
 {
     if (*ppT)
@@ -23,6 +25,8 @@ class MainWindow : public BaseWindow<MainWindow>
 
 
     ID2D1Bitmap* buffer;
+    ID2D1BitmapRenderTarget* pBufferTarget;
+    ID2D1SolidColorBrush* pBufferBrush;
     D2D1_ELLIPSE            ellipse;
     ID2D1SolidColorBrush* pStroke;
     void    CalculateLayout();
@@ -70,6 +74,10 @@ HRESULT MainWindow::CreateGraphicsResources()
             D2D1::RenderTargetProperties(),
             D2D1::HwndRenderTargetProperties(m_hwnd, size),
             &pRenderTarget);
+        if (SUCCEEDED(hr)) {
+            hr = pRenderTarget->CreateCompatibleRenderTarget(D2D1::SizeF(100.0f, 100.0f), &pBufferTarget);
+
+        }
 
         if (SUCCEEDED(hr))
         {
@@ -79,17 +87,17 @@ HRESULT MainWindow::CreateGraphicsResources()
                 hr = pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.1f, 0.1f, 0.1f), &pStroke);
                 if (SUCCEEDED(hr))
                 {
-                    auto bmProps = D2D1::BitmapProperties();
-                    bmProps.pixelFormat = pRenderTarget->GetPixelFormat();
-
-                    pRenderTarget->GetDpi(&bmProps.dpiX, &bmProps.dpiY);
-                    printf_s("%lf \n %lf \n ", bmProps.dpiX, bmProps.dpiY);
-
-                    hr = pRenderTarget->CreateBitmap(D2D1::SizeU((int)pRenderTarget->GetSize().width, (int)pRenderTarget->GetSize().height), bmProps, &buffer);
+                    hr = pBufferTarget->CreateSolidColorBrush(D2D1::ColorF(0.5f, 0.5f, 0.5f), &pBufferBrush);
+                    
                     if (SUCCEEDED(hr)) {
-                        CalculateLayout();
+                        hr = pBufferTarget->GetBitmap(&buffer);
+                        if (SUCCEEDED(hr)) {
 
+                            CalculateLayout();
+
+                        }
                     }
+
                     
                 }
             }
@@ -136,7 +144,19 @@ void MainWindow::OnPaint()
         pRenderTarget->Clear(D2D1::ColorF(111, 0.0f));
         pRenderTarget->FillEllipse(ellipse, pBrush);
         pRenderTarget->DrawEllipse(ellipse, pStroke);
+        pBufferTarget->BeginDraw();
+        pBufferTarget->Clear();
+        if (icall < 20) {
+            pBufferTarget->DrawLine(D2D1::Point2F(10.0f, 10.0f), D2D1::Point2F(150.0f, 150.0f), pBufferBrush, 20.0f);
+            icall++;
+        }
+        else {
+            pBufferTarget->DrawLine(D2D1::Point2F(10.0f, 10.0f), D2D1::Point2F(150.0f, 150.0f), pBufferBrush, 5.0f);
 
+        }
+        pBufferTarget->EndDraw();
+        pRenderTarget->DrawRectangle(D2D1::RectF(0.0f, 0.0f, 160.0f, 150.0f), pBrush);
+        pRenderTarget->DrawBitmap(buffer, D2D1::RectF(0.0f, 0.0f, 150.0f, 150.0f),1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,D2D1::RectF(0.0f, 0.0f, 200.0f, 200.0f));
         // Draw hands
         SYSTEMTIME time;
         GetLocalTime(&time);
@@ -156,7 +176,7 @@ void MainWindow::OnPaint()
         {
             DiscardGraphicsResources();
         }
-        EndPaint(m_hwnd, &ps);
+        printf_s("%d\n",EndPaint(m_hwnd, &ps));
     }
 }
 
