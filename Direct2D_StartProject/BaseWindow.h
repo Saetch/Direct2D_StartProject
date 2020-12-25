@@ -66,6 +66,15 @@ public:
 
     HWND Window() const { return m_hwnd; }
 
+    template <class T>
+    static inline void SafeRelease(T** ppT)
+    {
+        if (*ppT)
+        {
+            (*ppT)->Release();
+            *ppT = NULL;
+        }
+    }
 protected:
 
     virtual PCWSTR  ClassName() const = 0;

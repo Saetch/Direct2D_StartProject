@@ -1,6 +1,7 @@
 #include "entryPoint.h"
 #include <windows.h>
 #include <d2d1.h>
+#include <stdio.h>
 #pragma comment(lib, "d2d1")
 
 #include "BaseWindow.h"
@@ -19,6 +20,9 @@ class MainWindow : public BaseWindow<MainWindow>
     ID2D1Factory* pFactory;
     ID2D1HwndRenderTarget* pRenderTarget;
     ID2D1SolidColorBrush* pBrush;
+
+
+    ID2D1Bitmap* buffer;
     D2D1_ELLIPSE            ellipse;
     ID2D1SolidColorBrush* pStroke;
     void    CalculateLayout();
@@ -69,13 +73,24 @@ HRESULT MainWindow::CreateGraphicsResources()
 
         if (SUCCEEDED(hr))
         {
-            const D2D1_COLOR_F color = D2D1::ColorF(1.0f, 1.0f, 0);
+            const D2D1_COLOR_F color = D2D1::ColorF(1.0f, 1.0f, 0, 1.0f);
             hr = pRenderTarget->CreateSolidColorBrush(color, &pBrush);
             if (SUCCEEDED(hr)) {
                 hr = pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.1f, 0.1f, 0.1f), &pStroke);
                 if (SUCCEEDED(hr))
                 {
-                    CalculateLayout();
+                    auto bmProps = D2D1::BitmapProperties();
+                    bmProps.pixelFormat = pRenderTarget->GetPixelFormat();
+
+                    pRenderTarget->GetDpi(&bmProps.dpiX, &bmProps.dpiY);
+                    printf_s("%lf \n %lf \n ", bmProps.dpiX, bmProps.dpiY);
+
+                    hr = pRenderTarget->CreateBitmap(D2D1::SizeU((int)pRenderTarget->GetSize().width, (int)pRenderTarget->GetSize().height), bmProps, &buffer);
+                    if (SUCCEEDED(hr)) {
+                        CalculateLayout();
+
+                    }
+                    
                 }
             }
             
@@ -118,8 +133,7 @@ void MainWindow::OnPaint()
 
         pRenderTarget->BeginDraw();
 
-        pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::SkyBlue));
-
+        pRenderTarget->Clear(D2D1::ColorF(111, 0.0f));
         pRenderTarget->FillEllipse(ellipse, pBrush);
         pRenderTarget->DrawEllipse(ellipse, pStroke);
 
@@ -161,7 +175,7 @@ void MainWindow::Resize()
     }
 }
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
+int main(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
     MainWindow win;
 
